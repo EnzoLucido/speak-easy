@@ -22,6 +22,15 @@ function App() {
       mediaRecorder.onstop = () => {
         const blob = new Blob(audioChunksRef.current, { type: 'audio/wav' })
         const url = URL.createObjectURL(blob)
+        const formData = new FormData()
+        formData.append('audio', blob, 'recording.wav')
+        fetch('https://speakeasy-53jo.onrender.com/', {
+          method: 'POST',
+          body: formData,
+        })
+        .then((res) => res.text())
+        .then((text) => console.log(text))
+        .catch((err) => console.error('Error uploading audio:', err))
         setAudioUrl(url)
       }
 
@@ -42,9 +51,9 @@ function App() {
       <h1>Audio Recorder</h1>
 
       {!recording ? (
-        <button onClick={startRecording}>🎙️ Start Recording</button>
+        <button onClick={startRecording}>Start Recording</button>
       ) : (
-        <button onClick={stopRecording}>🛑 Stop Recording</button>
+        <button onClick={stopRecording}>Stop Recording</button>
       )}
 
       {audioUrl && (
