@@ -6,7 +6,7 @@ import os
 import tempfile
 
 app = Flask(__name__)
-CORS(app)  # allow frontend access
+CORS(app)
 
 @app.route('/analyze', methods=['POST'])
 def analyze_audio():
@@ -21,20 +21,29 @@ def analyze_audio():
             snd = parselmouth.Sound(temp_audio.name)
             pitch = snd.to_pitch()
             pitch_values = pitch.selected_array['frequency']
-            pitch_mean = np.mean(pitch_values[pitch_values > 0])
+            pitch_timestamps = pitch.xs()
 
+            # Keep only voiced frames
+            voiced = pitch_values > 0
+            pitch_data = [
+                {'x': float(t), 'y': float(f)}
+                for t, f in zip(pitch_timestamps, pitch_values)
+                if f > 0
+            ]
+
+            # Formants
             formants = snd.to_formant_burg()
             duration = snd.get_total_duration()
-            times = np.linspace(0, duration, 100)
-            f1 = [formants.get_value_at_time(1, t) for t in times]
-            f2 = [formants.get_value_at_time(2, t) for t in times]
-            f3 = [formants.get_value_at_time(3, t) for t in times]
+            times = np.linspace(0, duration, int(max(1, duration*25)))
+            f1 = [{'x': float(t), 'y': float(formants.get_value_at_time(1, t) or 0)} for t in times]
+            f2 = [{'x': float(t), 'y': float(formants.get_value_at_time(2, t) or 0)} for t in times]
+            f3 = [{'x': float(t), 'y': float(formants.get_value_at_time(3, t) or 0)} for t in times]
 
             result = {
-                'pitch': round(pitch_mean, 2),
-                'f1': round(np.nanmean(f1), 2),
-                'f2': round(np.nanmean(f2), 2),
-                'f3': round(np.nanmean(f3), 2)
+                'pitch': pitch_data,
+                'f1': f1,
+                'f2': f2,
+                'f3': f3
             }
         except Exception as e:
             result = {'error': str(e)}
