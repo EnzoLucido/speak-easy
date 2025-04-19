@@ -18,7 +18,7 @@ def analyze_audio():
 
     file = request.files['audio']
 
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_input, \
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".input") as temp_input, \
          tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_wav:
 
         file.save(temp_input.name)
@@ -28,12 +28,12 @@ def analyze_audio():
             ffmpeg.input(temp_input.name).output(
                 temp_wav.name,
                 format='wav',
-                acodec='pcm_s16le',
-                ac=1,
-                ar='16000'
+                acodec='pcm_s16le',  # 16-bit PCM format
+                ac=1,                 # mono
+                ar='16000'            # 16kHz sample rate (Praat-friendly)
             ).run(overwrite_output=True, quiet=True)
 
-            # Use converted WAV file for analysis
+            # Use the converted WAV file for analysis
             snd = parselmouth.Sound(temp_wav.name)
             pitch = snd.to_pitch()
             pitch_values = pitch.selected_array['frequency']
@@ -67,7 +67,9 @@ def analyze_audio():
         except Exception as e:
             result = {'error': str(e)}
 
+    # Clean up temporary files
     os.remove(temp_input.name)
     os.remove(temp_wav.name)
+
     return jsonify(result)
 
