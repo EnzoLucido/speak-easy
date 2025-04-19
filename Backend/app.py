@@ -10,6 +10,12 @@ app = Flask(__name__)
 CORS(app)
 
 @app.route('/analyze', methods=['POST'])
+def safe_float(value):
+    try:
+        f = float(value)
+        return f if np.isfinite(f) else None  # Convert NaN or inf to None (JSON will convert this to null)
+    except:
+        return None
 def analyze_audio():
     print("call to backend!")
 
@@ -51,10 +57,10 @@ def analyze_audio():
             formants = snd.to_formant_burg()
             duration = snd.get_total_duration()
             times = np.linspace(0, duration, int(max(1, duration*25)))
-            f1 = [{'x': float(t), 'y': float(formants.get_value_at_time(1, t) or 0)} for t in times]
-            f2 = [{'x': float(t), 'y': float(formants.get_value_at_time(2, t) or 0)} for t in times]
-            f3 = [{'x': float(t), 'y': float(formants.get_value_at_time(3, t) or 0)} for t in times]
-
+            f1 = [{'x': float(t), 'y': safe_float(formants.get_value_at_time(1, t))} for t in times]
+            f2 = [{'x': float(t), 'y': safe_float(formants.get_value_at_time(2, t))} for t in times]
+            f3 = [{'x': float(t), 'y': safe_float(formants.get_value_at_time(3, t))} for t in times]
+            
             result = {
                 'pitch': pitch_data,
                 'f1': f1,
