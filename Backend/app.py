@@ -10,10 +10,10 @@ CORS(app)
 
 @app.route('/analyze', methods=['POST'])
 def analyze_audio():
-    if 'file' not in request.files:
+    if 'audio' not in request.files:
         return jsonify({'error': 'No file uploaded'}), 400
 
-    file = request.files['file']
+    file = request.files['audio']
 
     with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_audio:
         file.save(temp_audio.name)

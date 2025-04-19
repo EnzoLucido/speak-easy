@@ -24,12 +24,12 @@ function App() {
         const url = URL.createObjectURL(blob)
         const formData = new FormData()
         formData.append('audio', blob, 'recording.wav')
-        fetch('https://speakeasy-53jo.onrender.com/', {
+        fetch('https://speakeasy-53jo.onrender.com/analyze', {
           method: 'POST',
           body: formData,
         })
         .then((res) => res.text())
-        .then((text) => console.log(text))
+        .then((data) => console.log('Response from server:', data))
         .catch((err) => console.error('Error uploading audio:', err))
         setAudioUrl(url)
       }
