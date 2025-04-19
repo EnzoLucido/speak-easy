@@ -20,10 +20,10 @@ function App() {
       }
 
       mediaRecorder.onstop = () => {
-        const blob = new Blob(audioChunksRef.current, { type: 'audio/wav' })
+        const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' })
         const url = URL.createObjectURL(blob)
         const formData = new FormData()
-        formData.append('audio', blob, 'recording.wav')
+        formData.append('audio', blob, 'recording.webm')
         fetch('https://speakeasy-53jo.onrender.com/analyze', {
           method: 'POST',
           body: formData,
@@ -60,8 +60,8 @@ function App() {
         <div style={{ marginTop: '1rem' }}>
           <audio controls src={audioUrl}></audio>
           <br />
-          <a href={audioUrl} download="recording.wav">Download Recording</a>
-        </div>
+          <a href={audioUrl} download="recording.webm">Download Recording</a>
+          </div>
       )}
     </main>
   )
