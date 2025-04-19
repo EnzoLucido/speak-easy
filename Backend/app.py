@@ -4,21 +4,37 @@ import parselmouth
 import numpy as np
 import os
 import tempfile
+import ffmpeg
 
 app = Flask(__name__)
 CORS(app)
 
 @app.route('/analyze', methods=['POST'])
 def analyze_audio():
-    if 'file' not in request.files:
+    print("call to backend!")
+
+    if 'audio' not in request.files:
         return jsonify({'error': 'No file uploaded'}), 400
 
-    file = request.files['file']
+    file = request.files['audio']
 
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_audio:
-        file.save(temp_audio.name)
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_input, \
+         tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_wav:
+
+        file.save(temp_input.name)
+
         try:
-            snd = parselmouth.Sound(temp_audio.name)
+            # Convert to proper WAV format using ffmpeg
+            ffmpeg.input(temp_input.name).output(
+                temp_wav.name,
+                format='wav',
+                acodec='pcm_s16le',
+                ac=1,
+                ar='16000'
+            ).run(overwrite_output=True, quiet=True)
+
+            # Use converted WAV file for analysis
+            snd = parselmouth.Sound(temp_wav.name)
             pitch = snd.to_pitch()
             pitch_values = pitch.selected_array['frequency']
             pitch_timestamps = pitch.xs()
@@ -45,9 +61,13 @@ def analyze_audio():
                 'f2': f2,
                 'f3': f3
             }
+
+        except ffmpeg.Error as e:
+            result = {'error': 'FFmpeg error: ' + e.stderr.decode()}
         except Exception as e:
             result = {'error': str(e)}
 
-    os.remove(temp_audio.name)
+    os.remove(temp_input.name)
+    os.remove(temp_wav.name)
     return jsonify(result)
 
