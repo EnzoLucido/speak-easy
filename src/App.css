@@ -1,5 +1,30 @@
 /* 📄 App.css */
 
+
+
+.guide-button {
+  position: fixed;
+  top: 1rem;
+  right: 1rem; /* ✅ move to right */
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  background-color: #4a90e2;
+  color: white; /* ✅ keep text color white on hover */
+  border: none;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 10000;
+  transition: background-color 0.2s ease;
+}
+
+.guide-button:hover {
+  background-color: #357ab8; /* ✅ darker blue */
+  color: white; /* ✅ prevent hover text color change */
+}
+
+
 .card, .chart-container {
   background-color: #ffffff;
   padding: 2rem;
@@ -50,9 +75,9 @@
   width: 80px;
   height: 80px;
   font-size: 2.5rem;
-  background-color: #2ecc71;
-  color: white;
-  border: none;
+  background-color: transparent;
+  color: #555;
+  border: 2px solid #555;
   border-radius: 50%;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   cursor: pointer;
@@ -61,7 +86,7 @@
 }
 
 .side-play-button:hover {
-  background-color: #27ae60;
+  background-color: #333;
 }
 
 
@@ -88,6 +113,15 @@ audio {
   background-color: #f9f9f9;
   outline: none;
 }
+.stop-button {
+  background-color: #e74c3c !important; /* Red */
+  color: white;
+}
+
+.stop-button:hover {
+  background-color: #c0392b !important; /* Darker red on hover */
+}
+
 
 @keyframes logo-spin {
   from {
