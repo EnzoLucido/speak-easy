@@ -110,6 +110,7 @@ function App() {
           try {
             const data = JSON.parse(text)
             console.log("🧪 Parsed JSON:", data)
+            console.log("🧪 Analysis result:", data)
             setAnalysis(data)
           } catch (err) {
             console.error("❌ Failed to parse JSON:", text)
@@ -241,6 +242,14 @@ function App() {
           <a href={audioUrl} download="recording.webm">Download Recording</a>
         </div>
       )}
+      {analysis?.voice && (
+        <div className="analysis-stats">
+          <p><strong>Mean Pitch (F0):</strong> {analysis.voice.meanF0?.toFixed(2)} Hz</p>
+          <p><strong>Pitch Variation (Stdev F0):</strong> {analysis.voice.stdevF0?.toFixed(2)} Hz</p>
+          <p><strong>HNR (Harmonics-to-Noise Ratio):</strong> {analysis.voice.hnr?.toFixed(2)} dB</p>
+        </div>
+      )}
+
 
       {loading && <p style={{ color: '#888', fontStyle: 'italic' }}>Analyzing...</p>}
 

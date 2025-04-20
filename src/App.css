@@ -7,6 +7,22 @@
   margin: 2rem 0;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
+.analysis-stats {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f8f8f8;
+  max-width: 400px;
+  line-height: 1.5;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.analysis-stats strong {
+  color: #222;
+}
+
 
 .logo {
   height: 5rem;
