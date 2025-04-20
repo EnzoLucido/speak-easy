@@ -1,12 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="icon" type="image/png" href="/SpeakEasy.png" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="App.css"> 
-  <title>SpeakEasy Voice Analysis</title>
+  <title>SpeakEasy Guide</title>
+  <style>
+    :root {
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+      line-height: 1.6;
+      font-weight: 400;
+      background-color: #e6ecf0;
+      color: #2c3e50;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      margin: 0;
+      padding: 2rem;
+      background: linear-gradient(135deg, #e6ecf0 0%, #ffffff 100%);
+      color: #2c3e50;
+      max-width: 960px;
+      margin-left: auto;
+      margin-right: auto;
+      position: relative;
+    }
+
+    h1, h2, h3 {
+      color: #2c3e50;
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      text-align: center;
+    }
+
+    p {
+      margin-bottom: 1rem;
+    }
+
+    ul {
+      padding-left: 1.5rem;
+    }
+
+    a {
+      color: #4A90E2;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    a:hover {
+      color: #2ECC71;
+    }
+
+    .top-back-button {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      padding: 0.6rem 1.2rem;
+      background-color: #4a90e2;
+      color: white;
+      font-weight: bold;
+      text-decoration: none;
+      border: none;
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+      transition: background-color 0.2s ease;
+    }
+
+    .top-back-button:hover {
+      background-color: #1f77d0;
+    }
+
+    .bottom-button-wrapper {
+      text-align: center;
+      margin-top: 3rem;
+    }
+
+    .back-button {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      background-color: #4a90e2;
+      color: white;
+      font-weight: bold;
+      text-decoration: none;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .back-button:hover {
+      background-color: #1f77d0;
+    }
+
+    img.logo {
+      display: block;
+      max-width: 200px;
+      margin: 2rem auto 1rem;
+    }
+  </style>
 </head>
 <body>
+
+  <a href="/" class="top-back-button">Back</a>
 
   <h1>A Guide to Using SpeakEasy</h1>
 
@@ -21,7 +122,7 @@
   <p>A measure of how much your pitch varies.</p>
 
   <h3>Harmonics-to-Noise Ratio (HNR)</h3>
-  <p>The clarity of a voice. Lower scores indicate a hoarseness or breathiness.</p>
+  <p>The clarity of a voice. Lower scores indicate hoarseness or breathiness.</p>
 
   <h2>📊 Visualized on the Chart</h2>
 
@@ -46,27 +147,9 @@
   <p>Voice analysis is very susceptible to noise, so if you see something that looks like an outlier, it probably is!</p>
   <p>Some words are naturally higher than others, so it can be useful to compare saying the same words to one another.</p>
 
-  <div style="text-align: center; margin-top: 3rem;">
+  <div class="bottom-button-wrapper">
     <a href="/" class="back-button">Back to SpeakEasy</a>
   </div>
-  <style>
-  .back-button {
-    display: inline-block;
-    padding: 0.75rem 1.5rem;
-    background-color: #4a90e2;
-    color: white;
-    font-weight: bold;
-    text-decoration: none;
-    border-radius: 6px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.2s ease;
-  }
-
-  .back-button:hover {
-    background-color: #1f77d0;
-  }
-</style>
 
 </body>
 </html>
-
