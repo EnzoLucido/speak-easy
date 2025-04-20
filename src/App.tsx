@@ -375,9 +375,9 @@ function App() {
   
         {analysis?.voice && (
           <div className="analysis-stats" style={{ marginTop: '1rem' }}>
-            <p><strong>Mean Pitch (F0):</strong> {analysis.voice.meanF0?.toFixed(2)} Hz</p>
-            <p><strong>Pitch Variation (Stdev F0):</strong> {analysis.voice.stdevF0?.toFixed(2)} Hz</p>
-            <p><strong>HNR (Harmonics-to-Noise Ratio):</strong> {analysis.voice.hnr?.toFixed(2)} dB</p>
+            <p><strong>Mean Pitch:</strong> {analysis.voice.meanF0?.toFixed(2)} Hz</p>
+            <p><strong>Pitch Standard Deviation:</strong> {analysis.voice.stdevF0?.toFixed(2)} Hz</p>
+            <p><strong>Harmonics-to-Noise Ratio:</strong> {analysis.voice.hnr?.toFixed(2)} dB</p>
           </div>
         )}
   
