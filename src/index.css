@@ -1,62 +1,68 @@
+/* 📄 index.css */
+
 :root {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
   line-height: 1.6;
   font-weight: 400;
-
-  color: #F8EBD7; /* soft ivory */
-  background-color: #dabbb5; /* mahogany brown */
-
+  background-color: #e6ecf0;
+  color: #2c3e50;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
   margin: 0;
+  padding: 0;
   min-height: 100vh;
-  padding: 2rem;
-  background-color: #af918c;
-  color: #F8EBD7;
+  background-color: #e6ecf0;
+  color: #2c3e50;
   display: flex;
-  align-items: center;
   justify-content: center;
 }
 
-/* Subtle, upscale link styling */
+#root {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem;
+  width: 100%;
+  text-align: center;
+}
+
+/* Typography */
+h1, h2, h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: #2c3e50;
+}
+
+h1 {
+  font-size: 2.5rem;
+}
+
 a {
-  color: #2ECC71;
+  color: #4A90E2;
   font-weight: 600;
   text-decoration: none;
 }
 a:hover {
-  color: #CBA135;
-  text-shadow: 0 0 4px #CBA135aa;
+  color: #2ECC71;
 }
 
-/* Button with warm glow */
+/* Global button style */
 button {
-  background-color: #7B3E3E;
-  color: #F8EBD7;
-  border: 1px solid #CBA135;
-  padding: 0.7em 1.5em;
+  background-color: #4A90E2;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+  color: white;
   border-radius: 6px;
-  font-size: 1.05rem;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 0 10px #2ECC7144;
+  margin-top: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.25s ease;
 }
-
 button:hover {
-  background-color: #2ECC71;
-  color: #3E2723;
-  box-shadow: 0 0 15px #2ECC71aa;
-}
-
-h1 {
-  font-size: 3rem;
-  margin-bottom: 1.5rem;
-  letter-spacing: 1px;
-  text-align: center;
-  color: #F8EBD7;
+  background-color: #1f77d0;
 }
