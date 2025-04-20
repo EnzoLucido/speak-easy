@@ -6,6 +6,8 @@ import os
 import tempfile
 import ffmpeg
 import math
+import json
+
 
 app = Flask(__name__)
 CORS(app)
@@ -23,6 +25,8 @@ def clean_json(data):
     elif isinstance(data, list):
         return [clean_json(i) for i in data]
     elif isinstance(data, float) and (math.isnan(data) or math.isinf(data)):
+        return None
+    elif isinstance(data, str) and data.lower() == 'nan':
         return None
     return data
 
@@ -87,6 +91,6 @@ def analyze_audio():
     # Clean up temporary files
     os.remove(temp_input.name)
     os.remove(temp_wav.name)
-    print("Returning JSON sample:", result['pitch'][:3])
+    print(json.dumps(clean_json(result))[:300])
     return jsonify((clean_json(result)))
 
