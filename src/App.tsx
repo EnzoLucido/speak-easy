@@ -131,8 +131,12 @@ function App() {
 
   const startRecording = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-    const mediaRecorder = new MediaRecorder(stream)
-    mediaRecorderRef.current = mediaRecorder
+    const mimeType = MediaRecorder.isTypeSupported("audio/webm")
+    ? "audio/webm"
+    : "audio/wav"  // ✅ fallback for Safari
+  
+  const mediaRecorder = new MediaRecorder(stream, { mimeType })
+      mediaRecorderRef.current = mediaRecorder
     audioChunksRef.current = []
 
     mediaRecorder.ondataavailable = (e) => {
@@ -142,13 +146,14 @@ function App() {
     }
 
     mediaRecorder.onstop = () => {
-      const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' })
+      const blob = new Blob(audioChunksRef.current, { type: mimeType })
       const url = URL.createObjectURL(blob)
       setAudioUrl(url)
       setCurrentTime(0)
 
       const formData = new FormData()
-      formData.append('audio', blob, 'recording.webm')
+      const fileExtension = mimeType.includes('webm') ? 'webm' : 'wav'
+      formData.append('audio', blob, `recording.${fileExtension}`)
       setLoading(true)
 
       fetch('https://speakeasy-53jo.onrender.com/analyze', {
