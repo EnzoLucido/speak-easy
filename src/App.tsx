@@ -284,8 +284,8 @@ function App() {
                 }
               },
               y: {
-                min: range[0],
-                max: range[1],
+                min: label === 'Pitch' ? 60 : range[0],
+                max: label === 'Pitch' ? 450 : range[1],
                 title: {
                   display: true,
                   text: 'Frequency (Hz)'
