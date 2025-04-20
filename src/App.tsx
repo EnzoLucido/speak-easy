@@ -130,72 +130,80 @@ function App() {
   }, [audioUrl])
 
   const startRecording = async () => {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-    const mimeType = MediaRecorder.isTypeSupported("audio/webm")
-    ? "audio/webm"
-    : "audio/wav"  // ✅ fallback for Safari
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
   
-  const mediaRecorder = new MediaRecorder(stream, { mimeType })
+      const mimeType = MediaRecorder.isTypeSupported("audio/webm")
+        ? "audio/webm"
+        : "audio/wav"  // ✅ fallback for Safari
+  
+      console.log("🎙️ Using MIME type:", mimeType)
+  
+      const mediaRecorder = new MediaRecorder(stream, { mimeType })
       mediaRecorderRef.current = mediaRecorder
-    audioChunksRef.current = []
-
-    mediaRecorder.ondataavailable = (e) => {
-      if (e.data.size > 0) {
-        audioChunksRef.current.push(e.data)
+      audioChunksRef.current = []
+  
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          audioChunksRef.current.push(e.data)
+        }
       }
-    }
-
-    mediaRecorder.onstop = () => {
-      const blob = new Blob(audioChunksRef.current, { type: mimeType })
-      const url = URL.createObjectURL(blob)
-      setAudioUrl(url)
-      setCurrentTime(0)
-
-      const formData = new FormData()
-      const fileExtension = mimeType.includes('webm') ? 'webm' : 'wav'
-      formData.append('audio', blob, `recording.${fileExtension}`)
-      setLoading(true)
-
-      fetch('https://speakeasy-53jo.onrender.com/analyze', {
-        method: 'POST',
-        body: formData
-      })
-        .then(async (res) => {
-          const text = await res.text()
-          try {
-            const data = JSON.parse(text)
-            setAnalysis(data)
-
-            const allTimestamps = [
-              ...(data.pitch || []).map((d: any) => d.x),
-              ...(data.f1 || []).map((d: any) => d.x),
-              ...(data.f2 || []).map((d: any) => d.x),
-              ...(data.f3 || []).map((d: any) => d.x)
-            ].filter((x: any) => typeof x === 'number')
-            
-            const globalMinX = Math.min(...allTimestamps)
-            const inferred = Math.max(...allTimestamps)
-            
-            console.log("📏 Normalized base x =", globalMinX)
-            console.log("⏱️ Inferred duration from data:", inferred)
-            
-            setDuration(inferred)
-            setAnalysis({
-              ...data,
-              _minX: globalMinX // attach to analysis for reuse
-            })
-            
-                      } catch (err) {
-            console.error("❌ Failed to parse JSON:", text)
-          }
+  
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(audioChunksRef.current, { type: mimeType })
+        const url = URL.createObjectURL(blob)
+        setAudioUrl(url)
+        setCurrentTime(0)
+  
+        const fileExtension = mimeType.includes('webm') ? 'webm' : 'wav'
+        const formData = new FormData()
+        formData.append('audio', blob, `recording.${fileExtension}`)
+        setLoading(true)
+  
+        fetch('https://speakeasy-53jo.onrender.com/analyze', {
+          method: 'POST',
+          body: formData
         })
-        .catch((err) => console.error('Error uploading audio:', err))
-        .finally(() => setLoading(false))
+          .then(async (res) => {
+            const text = await res.text()
+            try {
+              const data = JSON.parse(text)
+              setAnalysis(data)
+  
+              const allTimestamps = [
+                ...(data.pitch || []).map((d: any) => d.x),
+                ...(data.f1 || []).map((d: any) => d.x),
+                ...(data.f2 || []).map((d: any) => d.x),
+                ...(data.f3 || []).map((d: any) => d.x)
+              ].filter((x: any) => typeof x === 'number')
+  
+              const globalMinX = Math.min(...allTimestamps)
+              const inferred = Math.max(...allTimestamps)
+  
+              console.log("📏 Normalized base x =", globalMinX)
+              console.log("⏱️ Inferred duration from data:", inferred)
+  
+              setDuration(inferred)
+              setAnalysis({ ...data, _minX: globalMinX })
+  
+            } catch (err) {
+              console.error("❌ Failed to parse JSON:", text)
+            }
+          })
+          .catch((err) => console.error('Error uploading audio:', err))
+          .finally(() => setLoading(false))
+      }
+  
+      mediaRecorder.start()
+      setRecording(true)
+      console.log("✅ Recording started!")
+  
+    } catch (err) {
+      console.error("❌ Failed to access microphone or start recording:", err)
+      alert("Safari or your browser may not support recording, or permission was denied.")
     }
-
-    mediaRecorder.start()
-    setRecording(true)
   }
+  
 
   const stopRecording = () => {
     mediaRecorderRef.current?.stop()
