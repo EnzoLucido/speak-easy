@@ -9,13 +9,13 @@ import ffmpeg
 app = Flask(__name__)
 CORS(app)
 
-@app.route('/analyze', methods=['POST'])
 def safe_float(value):
     try:
         f = float(value)
         return f if np.isfinite(f) else None  # Convert NaN or inf to None (JSON will convert this to null)
     except:
         return None
+@app.route('/analyze', methods=['POST'])
 def analyze_audio():
     print("call to backend!")
 

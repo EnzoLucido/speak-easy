@@ -15,6 +15,7 @@ ChartJS.register(LineElement, PointElement, LinearScale, Title, Tooltip, Legend,
 
 function App() {
   const [recording, setRecording] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [audioUrl, setAudioUrl] = useState<string | null>(null)
   const [analysis, setAnalysis] = useState<any>(null)
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
@@ -39,7 +40,7 @@ function App() {
 
       const formData = new FormData()
       formData.append('audio', blob, 'recording.webm')
-
+      setLoading(true) 
       fetch('https://speakeasy-53jo.onrender.com/analyze', {
         method: 'POST',
         body: formData,
@@ -50,6 +51,7 @@ function App() {
           setAnalysis(data)
         })
         .catch((err) => console.error('Error uploading audio:', err))
+        .finally(() => setLoading(false))
     }
 
     mediaRecorder.start()
@@ -107,6 +109,7 @@ function App() {
           <a href={audioUrl} download="recording.webm">Download Recording</a>
         </div>
       )}
+      {loading && <p style={{ color: '#888', fontStyle: 'italic' }}>Analyzing...</p>}
 
       {analysis && (
         <div style={{ marginTop: '2rem' }}>
