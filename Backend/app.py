@@ -48,7 +48,7 @@ def analyze_audio():
             # Keep only voiced frames
             voiced = pitch_values > 0
             pitch_data = [
-                {'x': float(t), 'y': float(f)}
+                {'x': float(t), 'y': safe_float(f)}
                 for t, f in zip(pitch_timestamps, pitch_values)
                 if f > 0
             ]
