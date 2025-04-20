@@ -45,7 +45,7 @@ function App() {
         method: 'POST',
         body: formData,
       })
-        .then(async (res) => {
+      .then(async (res) => {
         const text = await res.text()
         try {
           const data = JSON.parse(text)
@@ -54,11 +54,7 @@ function App() {
         } catch (err) {
           console.error("❌ Failed to parse JSON:", text)
         }
-        })
-        .then((data) => {
-          console.log('Response from server:', data)
-          setAnalysis(data)
-        })
+      })
         .catch((err) => console.error('Error uploading audio:', err))
         .finally(() => setLoading(false))
     }
@@ -122,10 +118,10 @@ function App() {
 
       {analysis && (
         <div style={{ marginTop: '2rem' }}>
-          {renderLineChart('Pitch (Hz)', analysis.pitch, '#2ecc71')}
-          {renderLineChart('Formant 1 (F1)', analysis.f1, '#f39c12')}
-          {renderLineChart('Formant 2 (F2)', analysis.f2, '#e74c3c')}
-          {renderLineChart('Formant 3 (F3)', analysis.f3, '#8e44ad')}
+          {analysis?.pitch && renderLineChart('Pitch (Hz)', analysis.pitch, '#2ecc71')}
+          {analysis?.f1 && renderLineChart('Formant 1 (F1)', analysis.f1, '#f39c12')}
+          {analysis?.f2 && renderLineChart('Formant 2 (F2)', analysis.f2, '#e74c3c')}
+          {analysis?.f3 && renderLineChart('Formant 3 (F3)', analysis.f3, '#8e44ad')}
         </div>
       )}
     </main>
