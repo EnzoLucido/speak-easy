@@ -11,6 +11,8 @@ import {
   CategoryScale
 } from 'chart.js'
 import annotationPlugin from 'chartjs-plugin-annotation'
+import './App.css'
+
 
 ChartJS.register(
   LineElement,
@@ -76,6 +78,9 @@ function App() {
   const [analysis, setAnalysis] = useState<any>(null)
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
+  const [isPlaying, setIsPlaying] = useState(false)
+  
+
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const [currentTime, setCurrentTime] = useState(0)
@@ -97,11 +102,18 @@ function App() {
 
     const handlePlay = () => {
       rafId = requestAnimationFrame(update)
+      setIsPlaying(true) // ✅ set to playing
     }
-
+    
     const handlePause = () => {
       cancelAnimationFrame(rafId)
+      setIsPlaying(false) // ✅ always reset when paused or ended
     }
+    audio.addEventListener('ended', () => {
+      handlePause()
+      setCurrentTime(0)
+    })
+    
 
     audio.addEventListener('play', handlePlay)
     audio.addEventListener('pause', handlePause)
@@ -252,43 +264,66 @@ function App() {
   }
 
   return (
-    <main style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
-      <h1>SpeakEasy Voice Analyzer</h1>
-
-      {!recording ? (
-        <button onClick={startRecording}>Start Recording</button>
-      ) : (
-        <button onClick={stopRecording}>Stop Recording</button>
+    <div style={{ position: 'relative' }}>
+      <main style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
+        <h1>SpeakEasy Voice Analyzer</h1>
+  
+        {!recording ? (
+          <button onClick={startRecording}>Start Recording</button>
+        ) : (
+          <button onClick={stopRecording}>Stop Recording</button>
+        )}
+  
+        {audioUrl && (
+          <div style={{ marginTop: '1rem' }}>
+            <audio ref={audioRef} controls src={audioUrl}></audio>
+            <br />
+            <a href={audioUrl} download="recording.webm">Download Recording</a>
+          </div>
+        )}
+  
+        {analysis?.voice && (
+          <div className="analysis-stats" style={{ marginTop: '1rem' }}>
+            <p><strong>Mean Pitch (F0):</strong> {analysis.voice.meanF0?.toFixed(2)} Hz</p>
+            <p><strong>Pitch Variation (Stdev F0):</strong> {analysis.voice.stdevF0?.toFixed(2)} Hz</p>
+            <p><strong>HNR (Harmonics-to-Noise Ratio):</strong> {analysis.voice.hnr?.toFixed(2)} dB</p>
+          </div>
+        )}
+  
+        {loading && <p style={{ color: '#888', fontStyle: 'italic' }}>Analyzing...</p>}
+  
+        {analysis && (
+          <div style={{ marginTop: '2rem' }}>
+            {analysis?.pitch && renderLineChart('Pitch (Hz)', analysis.pitch, '#2ecc71', currentTime)}
+            {analysis?.f1 && renderLineChart('Formant 1 (F1)', analysis.f1, '#f39c12', currentTime)}
+            {analysis?.f2 && renderLineChart('Formant 2 (F2)', analysis.f2, '#e74c3c', currentTime)}
+            {analysis?.f3 && renderLineChart('Formant 3 (F3)', analysis.f3, '#8e44ad', currentTime)}
+          </div>
+        )}
+      </main>
+  
+      {/* ✅ Floating Play Button (visible only after analysis is ready) */}
+      {audioUrl && analysis && (
+        <button
+        onClick={() => {
+          const audio = audioRef.current
+          if (audio) {
+            if (audio.paused) {
+              audio.play()
+              setIsPlaying(true)
+            } else {
+              audio.pause()
+              setIsPlaying(false)
+            }
+          }
+        }}
+          className="side-play-button"
+          aria-label="Play or Pause"
+        >
+          {isPlaying ? '⏸️' : '▶️'}
+        </button>
       )}
-
-      {audioUrl && (
-        <div style={{ marginTop: '1rem' }}>
-          <audio ref={audioRef} controls src={audioUrl}></audio>
-          <br />
-          <a href={audioUrl} download="recording.webm">Download Recording</a>
-        </div>
-      )}
-
-      {analysis?.voice && (
-        <div className="analysis-stats" style={{ marginTop: '1rem' }}>
-          <p><strong>Mean Pitch (F0):</strong> {analysis.voice.meanF0?.toFixed(2)} Hz</p>
-          <p><strong>Pitch Variation (Stdev F0):</strong> {analysis.voice.stdevF0?.toFixed(2)} Hz</p>
-          <p><strong>HNR (Harmonics-to-Noise Ratio):</strong> {analysis.voice.hnr?.toFixed(2)} dB</p>
-        </div>
-      )}
-
-      {loading && <p style={{ color: '#888', fontStyle: 'italic' }}>Analyzing...</p>}
-
-      {analysis && (
-        <div style={{ marginTop: '2rem' }}>
-          {analysis?.pitch && renderLineChart('Pitch (Hz)', analysis.pitch, '#2ecc71', currentTime)}
-          {analysis?.f1 && renderLineChart('Formant 1 (F1)', analysis.f1, '#f39c12', currentTime)}
-          {analysis?.f2 && renderLineChart('Formant 2 (F2)', analysis.f2, '#e74c3c', currentTime)}
-          {analysis?.f3 && renderLineChart('Formant 3 (F3)', analysis.f3, '#8e44ad', currentTime)}
-        </div>
-      )}
-    </main>
+    </div>
   )
-}
-
+}  
 export default App

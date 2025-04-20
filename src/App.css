@@ -10,17 +10,58 @@
 .analysis-stats {
   margin-top: 1.5rem;
   padding: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #f8f8f8;
-  max-width: 400px;
-  line-height: 1.5;
-  font-size: 1.1rem;
+  max-width: 600px;
+  text-align: center;
+  font-size: 1.2rem;
   color: #333;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.analysis-stats {
+  background: #fff;
+  padding: 1.25rem 2rem;
+  margin: 1rem auto;
+  max-width: 600px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+  font-size: 1.15rem;
+  text-align: center;
 }
 
 .analysis-stats strong {
   color: #222;
+}
+.play-button-container {
+  position: absolute;
+  right: 2rem;
+  top: 8rem; /* adjust based on where you want it */
+}
+
+.side-play-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 50%;
+  right: 2rem;
+  transform: translateY(-50%);
+  width: 80px;
+  height: 80px;
+  font-size: 2.5rem;
+  background-color: #2ecc71;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  z-index: 9999;
+  transition: background 0.2s ease;
+}
+
+.side-play-button:hover {
+  background-color: #27ae60;
 }
 
 
