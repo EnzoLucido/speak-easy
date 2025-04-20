@@ -82,13 +82,29 @@ def analyze_audio():
             f1 = [{'x': float(t), 'y': safe_float(formants.get_value_at_time(1, t))} for t in times]
             f2 = [{'x': float(t), 'y': safe_float(formants.get_value_at_time(2, t))} for t in times]
             f3 = [{'x': float(t), 'y': safe_float(formants.get_value_at_time(3, t))} for t in times]
-            
+           
+            voice_report = pitch.voice_report()
+
+            def find(pattern):
+                m = re.search(pattern, voice_report)
+                return float(m.group(1)) if m else None
+
+            jitter = find(r'Jitter \(local\): ([\d.]+) %')
+            shimmer = find(r'Shimmer \(local\): ([\d.]+) %')
+            mean_hnr = find(r'Mean harmonicity: ([\d.]+) dB')
+
             result = {
                 'pitch': pitch_data,
                 'f1': f1,
                 'f2': f2,
-                'f3': f3
+                'f3': f3,
+                'voice': {
+                    'jitter_percent': jitter,
+                    'shimmer_percent': shimmer,
+                    'mean_hnr_dB': mean_hnr
+                }
             }
+
 
         except ffmpeg.Error as e:
             result = {'error': 'FFmpeg error: ' + e.stderr.decode()}
