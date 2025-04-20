@@ -5,6 +5,7 @@ import numpy as np
 import os
 import tempfile
 import ffmpeg
+import math
 
 app = Flask(__name__)
 CORS(app)
@@ -15,6 +16,16 @@ def safe_float(value):
         return f if np.isfinite(f) else None  # Convert NaN or inf to None (JSON will convert this to null)
     except:
         return None
+
+def clean_json(data):
+    if isinstance(data, dict):
+        return {k: clean_json(v) for k, v in data.items()}
+    elif isinstance(data, list):
+        return [clean_json(i) for i in data]
+    elif isinstance(data, float) and (math.isnan(data) or math.isinf(data)):
+        return None
+    return data
+
 @app.route('/analyze', methods=['POST'])
 def analyze_audio():
     print("call to backend!")
@@ -76,6 +87,6 @@ def analyze_audio():
     # Clean up temporary files
     os.remove(temp_input.name)
     os.remove(temp_wav.name)
-
-    return jsonify(result)
+    print("Returning JSON sample:", result['pitch'][:3])
+    return jsonify((clean_json(result)))
 
