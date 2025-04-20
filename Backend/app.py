@@ -93,5 +93,5 @@ def analyze_audio():
     os.remove(temp_wav.name)
     cleaned = clean_json(result)
     print(json.dumps(cleaned)[:300])    
-    return Response(json.dumps(cleaned, allow_nan=False), content_type='application/json')
+    return Response(json.dumps(cleaned, ensure_ascii=False, allow_nan=False), mimetype='application/json')
 

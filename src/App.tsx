@@ -45,7 +45,16 @@ function App() {
         method: 'POST',
         body: formData,
       })
-        .then((res) => res.json())
+        .then(async (res) => {
+        const text = await res.text()
+        try {
+          const data = JSON.parse(text)
+          console.log("🧪 Parsed JSON:", data)
+          setAnalysis(data)
+        } catch (err) {
+          console.error("❌ Failed to parse JSON:", text)
+        }
+        })
         .then((data) => {
           console.log('Response from server:', data)
           setAnalysis(data)
@@ -64,7 +73,7 @@ function App() {
   }
 
   const renderLineChart = (label: string, data: any[], color: string) => {
-    const cleaned = data.filter(d => !isNaN(d.y))
+    const cleaned = data.filter(d => d && typeof d.y === 'number' && !isNaN(d.y))
     return (
       <div style={{ marginBottom: '2rem' }}>
         <h3>{label}</h3>
