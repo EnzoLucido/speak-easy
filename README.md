@@ -1,21 +1,21 @@
-# React + TypeScript + Vite
-Testing the commits
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# SpeakEasy
+This project allows vocal analysis in the browser. 
 
-While this project uses React, Vite supports many popular JS frameworks. [See all the supported frameworks](https://vitejs.dev/guide/#scaffolding-your-first-vite-project).
+You can visit the website at [https://speak-easy-pied.vercel.app/](https://speak-easy-pied.vercel.app/). It is being hosted online temporarily for HackDavis 2025.
 
-## Deploy Your Own
 
-Deploy your own Vite project with Vercel.
+To run your own version locally:
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/vercel/vercel/tree/main/examples/vite-react&template=vite-react)
-
-_Live Example: https://vite-react-example.vercel.app_
-
-### Deploying From Your Terminal
-
-You can deploy your new Vite project with a single command from your terminal using [Vercel CLI](https://vercel.com/download):
-
-```shell
-$ vercel
+```bash
+git clone https://github.com/EnzoLucido/speak-easy.git
+cd speak-easy/Backend
+pip install -r requirements.txt
+flask run
 ```
+## Resources we used
+
+[Parselmouth](https://parselmouth.readthedocs.io/)
+[Dr. Feinberg's Parselmouth](https://github.com/drfeinberg/PraatScripts)
+[VoiceLab](https://github.com/Voice-Lab/VoiceLab)
+
+
