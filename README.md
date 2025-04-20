@@ -1,7 +1,7 @@
 # SpeakEasy
 This project allows vocal analysis in the browser. 
 
-You can visit the website at [https://speak-easy-pied.vercel.app/](https://speak-easy-pied.vercel.app/). 
+You can visit the website at [https://speak-easy-pied.vercel.app/](https://speak-easy-pied.vercel.app/). It is being hosted online temporarily for HackDavis 2025.
 
 
 To run your own version locally:
