@@ -21,7 +21,14 @@ ChartJS.register(
   Legend,
   CategoryScale,
   annotationPlugin
-)
+);
+
+// ✅ Enable annotation globally for Chart.js 4
+ChartJS.defaults.plugins.annotation = {
+  ...ChartJS.defaults.plugins.annotation,
+  clip: false,
+};
+
 
 function App() {
   const [recording, setRecording] = useState(false)
@@ -36,15 +43,36 @@ function App() {
 
   // Track audio playback time
   useEffect(() => {
-    const audio = audioRef.current
-    if (!audio) return
-
-    const updateTime = () => setCurrentTime(audio.currentTime)
-    audio.addEventListener('timeupdate', updateTime)
-
-    return () => audio.removeEventListener('timeupdate', updateTime)
-  }, [])
-
+    const audio = audioRef.current;
+    if (!audio) return;
+  
+    let rafId: number;
+  
+    const update = () => {
+      setCurrentTime(audio.currentTime);
+      rafId = requestAnimationFrame(update);
+    };
+  
+    const handlePlay = () => {
+      rafId = requestAnimationFrame(update);
+    };
+  
+    const handlePause = () => {
+      cancelAnimationFrame(rafId);
+    };
+  
+    audio.addEventListener('play', handlePlay);
+    audio.addEventListener('pause', handlePause);
+    audio.addEventListener('ended', handlePause);
+  
+    return () => {
+      audio.removeEventListener('play', handlePlay);
+      audio.removeEventListener('pause', handlePause);
+      audio.removeEventListener('ended', handlePause);
+      cancelAnimationFrame(rafId);
+    };
+  }, []);
+  
   const startRecording = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
     const mediaRecorder = new MediaRecorder(stream)
@@ -161,6 +189,7 @@ function App() {
             plugins: {
               legend: { display: false },
               annotation: {
+                clip: false, // ← ADD THIS HERE!
                 annotations: {
                   nowLine: {
                     type: 'line',
