@@ -313,14 +313,18 @@ function App() {
 
   return (
     <div style={{ position: 'relative' }}>
+       <a href="/guide" className="guide-button">
+       How to Use SpeakEasy
+      </a>
       <main style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
         <h1>SpeakEasy Voice Analyzer</h1>
   
         {!recording ? (
           <button onClick={startRecording}>Start Recording</button>
-        ) : (
-          <button onClick={stopRecording}>Stop Recording</button>
-        )}
+              ) : (
+            <button onClick={stopRecording} className="stop-button">Stop Recording</button>
+          )}
+
   
         {audioUrl && (
           <div style={{ marginTop: '1rem' }}>
