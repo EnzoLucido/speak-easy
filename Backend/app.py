@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
 import parselmouth
 import numpy as np
@@ -91,6 +91,7 @@ def analyze_audio():
     # Clean up temporary files
     os.remove(temp_input.name)
     os.remove(temp_wav.name)
-    print(json.dumps(clean_json(result))[:300])
-    return jsonify((clean_json(result)))
+    cleaned = clean_json(result)
+    print(json.dumps(cleaned)[:300])    
+    return Response(json.dumps(cleaned, allow_nan=False), content_type='application/json')
 
