@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Line } from 'react-chartjs-2'
 import {
   Chart as ChartJS,
@@ -10,8 +10,18 @@ import {
   Legend,
   CategoryScale
 } from 'chart.js'
+import annotationPlugin from 'chartjs-plugin-annotation'
 
-ChartJS.register(LineElement, PointElement, LinearScale, Title, Tooltip, Legend, CategoryScale)
+ChartJS.register(
+  LineElement,
+  PointElement,
+  LinearScale,
+  Title,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  annotationPlugin
+)
 
 function App() {
   const [recording, setRecording] = useState(false)
@@ -20,6 +30,20 @@ function App() {
   const [analysis, setAnalysis] = useState<any>(null)
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
+
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const [currentTime, setCurrentTime] = useState(0)
+
+  // Track audio playback time
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio) return
+
+    const updateTime = () => setCurrentTime(audio.currentTime)
+    audio.addEventListener('timeupdate', updateTime)
+
+    return () => audio.removeEventListener('timeupdate', updateTime)
+  }, [])
 
   const startRecording = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
@@ -37,24 +61,26 @@ function App() {
       const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' })
       const url = URL.createObjectURL(blob)
       setAudioUrl(url)
+      setCurrentTime(0)
 
       const formData = new FormData()
       formData.append('audio', blob, 'recording.webm')
-      setLoading(true) 
+      setLoading(true)
+
       fetch('https://speakeasy-53jo.onrender.com/analyze', {
         method: 'POST',
-        body: formData,
+        body: formData
       })
-      .then(async (res) => {
-        const text = await res.text()
-        try {
-          const data = JSON.parse(text)
-          console.log("🧪 Parsed JSON:", data)
-          setAnalysis(data)
-        } catch (err) {
-          console.error("❌ Failed to parse JSON:", text)
-        }
-      })
+        .then(async (res) => {
+          const text = await res.text()
+          try {
+            const data = JSON.parse(text)
+            console.log("🧪 Parsed JSON:", data)
+            setAnalysis(data)
+          } catch (err) {
+            console.error("❌ Failed to parse JSON:", text)
+          }
+        })
         .catch((err) => console.error('Error uploading audio:', err))
         .finally(() => setLoading(false))
     }
@@ -68,34 +94,100 @@ function App() {
     setRecording(false)
   }
 
-  const renderLineChart = (label: string, data: any[], color: string) => {
-    const cleaned = data.filter(d => d && typeof d.y === 'number' && !isNaN(d.y))
+  const renderLineChart = (
+    label: string,
+    data: any[],
+    color: string,
+    currentTime: number
+  ) => {
+    // Set sensible limits per graph type
+    const yLimits: Record<string, [number, number]> = {
+      "Pitch (Hz)": [60, 400],
+      "Formant 1 (F1)": [200, 1000],
+      "Formant 2 (F2)": [600, 3000],
+      "Formant 3 (F3)": [1800, 4000]
+    }
+  
+    const [yMin, yMax] = yLimits[label] || [0, 5000] // fallback range
+  
+    // Clean + filter data within limits
+    const cleaned = data.filter(
+      (d) =>
+        d &&
+        typeof d.y === 'number' &&
+        !isNaN(d.y) &&
+        d.y >= yMin &&
+        d.y <= yMax
+    )
+  
     return (
-      <div style={{ marginBottom: '2rem' }}>
+      <div className="chart-container" style={{ marginBottom: '2rem' }}>
         <h3>{label}</h3>
         <Line
           data={{
-            labels: cleaned.map((d) => d.x.toFixed(2)),
             datasets: [
               {
-                label: label,
-                data: cleaned.map((d) => d.y),
+                label,
+                data: cleaned.map((d) => ({ x: d.x, y: d.y })),
                 borderColor: color,
                 backgroundColor: color + '33',
                 tension: 0.3,
+                pointRadius: 0,
+                borderWidth: 2
               }
             ]
           }}
           options={{
             responsive: true,
+            animation: false,
+            scales: {
+              x: {
+                type: 'linear',
+                min: 0, // always start from 0 seconds
+                title: {
+                  display: true,
+                  text: 'Time (s)'
+                }
+              },
+              y: {
+                min: yMin,
+                max: yMax,
+                title: {
+                  display: true,
+                  text: 'Frequency (Hz)'
+                }
+              }
+            },
             plugins: {
-              legend: { display: false }
+              legend: { display: false },
+              annotation: {
+                annotations: {
+                  nowLine: {
+                    type: 'line',
+                    xMin: currentTime,
+                    xMax: currentTime,
+                    borderColor: '#e74c3c',
+                    borderWidth: 2,
+                    label: {
+                      content: 'Now',
+                      display: true,
+                      position: 'start',
+                      backgroundColor: 'transparent',
+                      color: '#e74c3c',
+                      font: {
+                        weight: 'bold'
+                      }
+                    }
+                  }
+                }
+              }
             }
           }}
         />
       </div>
     )
   }
+  
 
   return (
     <main style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
@@ -109,21 +201,23 @@ function App() {
 
       {audioUrl && (
         <div style={{ marginTop: '1rem' }}>
-          <audio controls src={audioUrl}></audio>
+          <audio ref={audioRef} controls src={audioUrl}></audio>
           <br />
           <a href={audioUrl} download="recording.webm">Download Recording</a>
         </div>
       )}
+
       {loading && <p style={{ color: '#888', fontStyle: 'italic' }}>Analyzing...</p>}
 
       {analysis && (
         <div style={{ marginTop: '2rem' }}>
-          {analysis?.pitch && renderLineChart('Pitch (Hz)', analysis.pitch, '#2ecc71')}
-          {analysis?.f1 && renderLineChart('Formant 1 (F1)', analysis.f1, '#f39c12')}
-          {analysis?.f2 && renderLineChart('Formant 2 (F2)', analysis.f2, '#e74c3c')}
-          {analysis?.f3 && renderLineChart('Formant 3 (F3)', analysis.f3, '#8e44ad')}
+          {analysis?.pitch && renderLineChart('Pitch (Hz)', analysis.pitch, '#2ecc71', currentTime)}
+          {analysis?.f1 && renderLineChart('Formant 1 (F1)', analysis.f1, '#f39c12', currentTime)}
+          {analysis?.f2 && renderLineChart('Formant 2 (F2)', analysis.f2, '#e74c3c', currentTime)}
+          {analysis?.f3 && renderLineChart('Formant 3 (F3)', analysis.f3, '#8e44ad', currentTime)}
         </div>
       )}
+
     </main>
   )
 }
