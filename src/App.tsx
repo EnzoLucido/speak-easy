@@ -361,9 +361,9 @@ function App() {
   
         {analysis?.voice && (
           <div className="analysis-stats" style={{ marginTop: '1rem' }}>
-            <p><strong>Mean Pitch (F0):</strong> {analysis.voice.meanF0?.toFixed(2)} Hz</p>
-            <p><strong>Pitch Variation (Stdev F0):</strong> {analysis.voice.stdevF0?.toFixed(2)} Hz</p>
-            <p><strong>HNR (Harmonics-to-Noise Ratio):</strong> {analysis.voice.hnr?.toFixed(2)} dB</p>
+            <p><strong>Mean Pitch:</strong> {analysis.voice.meanF0?.toFixed(2)} Hz</p>
+            <p><strong>Pitch Standard Deviation:</strong> {analysis.voice.stdevF0?.toFixed(2)} Hz</p>
+            <p><strong>Harmonics-to-Noise Ratio:</strong> {analysis.voice.hnr?.toFixed(2)} dB</p>
           </div>
         )}
   
@@ -371,7 +371,7 @@ function App() {
   
         {analysis && (
           <div style={{ marginTop: '2rem' }}>
-          {analysis?.pitch && renderLineChart('Pitch (Hz)', analysis.pitch, '#2ecc71', currentTime, duration)}
+          {analysis?.pitch && renderLineChart('Pitch (F0)', analysis.pitch, '#2ecc71', currentTime, duration)}
           {analysis?.f1 && renderLineChart('Formant 1 (F1)', analysis.f1, '#f39c12', currentTime, duration)}
           {analysis?.f2 && renderLineChart('Formant 2 (F2)', analysis.f2, '#e74c3c', currentTime, duration)}
           {analysis?.f3 && renderLineChart('Formant 3 (F3)', analysis.f3, '#8e44ad', currentTime, duration)}
