@@ -43,35 +43,41 @@ function App() {
 
   // Track audio playback time
   useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
+    if (!audioUrl || !audioRef.current) return
+    const audio = audioRef.current
+    console.log("🎧 Audio is ready. Adding listeners.")
   
-    let rafId: number;
+    let rafId: number
   
     const update = () => {
-      setCurrentTime(audio.currentTime);
-      rafId = requestAnimationFrame(update);
-    };
+      if (!audio.paused) {
+        setCurrentTime(audio.currentTime)
+        console.log("🔁 currentTime:", audio.currentTime)
+        rafId = requestAnimationFrame(update)
+      }
+    }
   
     const handlePlay = () => {
-      rafId = requestAnimationFrame(update);
-    };
+      console.log("▶️ Audio started")
+      rafId = requestAnimationFrame(update)
+    }
   
     const handlePause = () => {
-      cancelAnimationFrame(rafId);
-    };
+      console.log("⏸ Audio paused or ended")
+      cancelAnimationFrame(rafId)
+    }
   
-    audio.addEventListener('play', handlePlay);
-    audio.addEventListener('pause', handlePause);
-    audio.addEventListener('ended', handlePause);
+    audio.addEventListener('play', handlePlay)
+    audio.addEventListener('pause', handlePause)
+    audio.addEventListener('ended', handlePause)
   
     return () => {
-      audio.removeEventListener('play', handlePlay);
-      audio.removeEventListener('pause', handlePause);
-      audio.removeEventListener('ended', handlePause);
-      cancelAnimationFrame(rafId);
-    };
-  }, []);
+      audio.removeEventListener('play', handlePlay)
+      audio.removeEventListener('pause', handlePause)
+      audio.removeEventListener('ended', handlePause)
+      cancelAnimationFrame(rafId)
+    }
+  }, [audioUrl])
   
   const startRecording = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
@@ -193,8 +199,8 @@ function App() {
                 annotations: {
                   nowLine: {
                     type: 'line',
-                    xMin: currentTime,
-                    xMax: currentTime,
+                    scaleID: 'x',              // <-- This tells it to draw vertically at x=value
+                    value: currentTime,        // ✅ Use value instead of xMin/xMax
                     borderColor: '#e74c3c',
                     borderWidth: 2,
                     label: {
@@ -240,6 +246,7 @@ function App() {
 
       {analysis && (
         <div style={{ marginTop: '2rem' }}>
+          
           {analysis?.pitch && renderLineChart('Pitch (Hz)', analysis.pitch, '#2ecc71', currentTime)}
           {analysis?.f1 && renderLineChart('Formant 1 (F1)', analysis.f1, '#f39c12', currentTime)}
           {analysis?.f2 && renderLineChart('Formant 2 (F2)', analysis.f2, '#e74c3c', currentTime)}
