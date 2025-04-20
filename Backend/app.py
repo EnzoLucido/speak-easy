@@ -19,6 +19,13 @@ def safe_float(value):
     except:
         return None
 
+def sanitize(data):
+    for i in range(len(data)):
+        if data[i][1] > 500 or data[i][1] < 50:
+            data[i][1] = float('nan') 
+    return data
+
+
 def clean_json(data):
     if isinstance(data, dict):
         return {k: clean_json(v) for k, v in data.items()}
