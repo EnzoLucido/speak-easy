@@ -313,7 +313,7 @@ function App() {
 
   return (
     <div style={{ position: 'relative' }}>
-       <a href="/guide" className="guide-button">
+       <a href="/guide.html" className="guide-button">
        How to Use SpeakEasy
       </a>
       <main style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
