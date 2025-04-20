@@ -46,6 +46,27 @@
   <p>Voice analysis is very susceptible to noise, so if you see something that looks like an outlier, it probably is!</p>
   <p>Some words are naturally higher than others, so it can be useful to compare saying the same words to one another.</p>
 
+  <div style="text-align: center; margin-top: 3rem;">
+    <a href="/" class="back-button">Back to SpeakEasy</a>
+  </div>
+  <style>
+  .back-button {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background-color: #4a90e2;
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s ease;
+  }
+
+  .back-button:hover {
+    background-color: #1f77d0;
+  }
+</style>
+
 </body>
 </html>
 
