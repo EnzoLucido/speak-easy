@@ -1,21 +1,35 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
+/* 📄 App.css */
+
+.card, .chart-container {
+  background-color: #ffffff;
   padding: 2rem;
-  text-align: center;
+  border-radius: 12px;
+  margin: 2rem 0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
 .logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+  height: 5rem;
+  margin: 1.5rem 0;
+  transition: transform 0.3s ease;
 }
 .logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+  transform: scale(1.05);
 }
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+
+.status-message {
+  color: #7f8c8d;
+  font-style: italic;
+  margin-top: 1rem;
+}
+
+audio {
+  margin-top: 1rem;
+  width: 100%;
+  max-width: 500px;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  outline: none;
 }
 
 @keyframes logo-spin {
@@ -26,17 +40,8 @@
     transform: rotate(360deg);
   }
 }
-
 @media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
+  .logo.react:hover {
     animation: logo-spin infinite 20s linear;
   }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
 }
