@@ -130,71 +130,80 @@ function App() {
   }, [audioUrl])
 
   const startRecording = async () => {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-    const mimeType = MediaRecorder.isTypeSupported("audio/webm")
-    ? "audio/webm"
-    : "audio/wav"  // ✅ fallback for Safari
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
   
-  const mediaRecorder = new MediaRecorder(stream, { mimeType })
+      const mimeType = MediaRecorder.isTypeSupported("audio/webm")
+        ? "audio/webm"
+        : "audio/wav"  // ✅ fallback for Safari
+  
+      console.log("🎙️ Using MIME type:", mimeType)
+  
+      const mediaRecorder = new MediaRecorder(stream, { mimeType })
       mediaRecorderRef.current = mediaRecorder
-    audioChunksRef.current = []
-
-    mediaRecorder.ondataavailable = (e) => {
-      if (e.data.size > 0) {
-        audioChunksRef.current.push(e.data)
+      audioChunksRef.current = []
+  
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          audioChunksRef.current.push(e.data)
+        }
       }
-    }
-
-    mediaRecorder.onstop = () => {
-      const blob = new Blob(audioChunksRef.current, { type: mimeType })
-      const url = URL.createObjectURL(blob)
-      setAudioUrl(url)
-      setCurrentTime(0)
-
-      const formData = new FormData()
-      formData.append('audio', blob, 'recording.webm')
-      setLoading(true)
-
-      fetch('https://speakeasy-53jo.onrender.com/analyze', {
-        method: 'POST',
-        body: formData
-      })
-        .then(async (res) => {
-          const text = await res.text()
-          try {
-            const data = JSON.parse(text)
-            setAnalysis(data)
-
-            const allTimestamps = [
-              ...(data.pitch || []).map((d: any) => d.x),
-              ...(data.f1 || []).map((d: any) => d.x),
-              ...(data.f2 || []).map((d: any) => d.x),
-              ...(data.f3 || []).map((d: any) => d.x)
-            ].filter((x: any) => typeof x === 'number')
-            
-            const globalMinX = Math.min(...allTimestamps)
-            const inferred = Math.max(...allTimestamps)
-            
-            console.log("📏 Normalized base x =", globalMinX)
-            console.log("⏱️ Inferred duration from data:", inferred)
-            
-            setDuration(inferred)
-            setAnalysis({
-              ...data,
-              _minX: globalMinX // attach to analysis for reuse
-            })
-            
-                      } catch (err) {
-            console.error("❌ Failed to parse JSON:", text)
-          }
+  
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(audioChunksRef.current, { type: mimeType })
+        const url = URL.createObjectURL(blob)
+        setAudioUrl(url)
+        setCurrentTime(0)
+  
+        const fileExtension = mimeType.includes('webm') ? 'webm' : 'wav'
+        const formData = new FormData()
+        formData.append('audio', blob, `recording.${fileExtension}`)
+        setLoading(true)
+  
+        fetch('https://speakeasy-53jo.onrender.com/analyze', {
+          method: 'POST',
+          body: formData
         })
-        .catch((err) => console.error('Error uploading audio:', err))
-        .finally(() => setLoading(false))
+          .then(async (res) => {
+            const text = await res.text()
+            try {
+              const data = JSON.parse(text)
+              setAnalysis(data)
+  
+              const allTimestamps = [
+                ...(data.pitch || []).map((d: any) => d.x),
+                ...(data.f1 || []).map((d: any) => d.x),
+                ...(data.f2 || []).map((d: any) => d.x),
+                ...(data.f3 || []).map((d: any) => d.x)
+              ].filter((x: any) => typeof x === 'number')
+  
+              const globalMinX = Math.min(...allTimestamps)
+              const inferred = Math.max(...allTimestamps)
+  
+              console.log("📏 Normalized base x =", globalMinX)
+              console.log("⏱️ Inferred duration from data:", inferred)
+  
+              setDuration(inferred)
+              setAnalysis({ ...data, _minX: globalMinX })
+  
+            } catch (err) {
+              console.error("❌ Failed to parse JSON:", text)
+            }
+          })
+          .catch((err) => console.error('Error uploading audio:', err))
+          .finally(() => setLoading(false))
+      }
+  
+      mediaRecorder.start()
+      setRecording(true)
+      console.log("✅ Recording started!")
+  
+    } catch (err) {
+      console.error("❌ Failed to access microphone or start recording:", err)
+      alert("Safari or your browser may not support recording, or permission was denied.")
     }
-
-    mediaRecorder.start()
-    setRecording(true)
   }
+  
 
   const stopRecording = () => {
     mediaRecorderRef.current?.stop()
@@ -206,16 +215,17 @@ function App() {
     rawData: { x: number, y: number }[],
     color: string,
     currentTime: number,
-    duration: number | null
+    duration: number | null,
+    overrideRange?: [number, number]
   ) => {
-    const ranges: Record<string, [number, number]> = {
+    const defaultRanges: Record<string, [number, number]> = {
       "Pitch (Hz)": [60, 450],
       "Formant 1 (F1)": [200, 1000],
       "Formant 2 (F2)": [600, 3000],
       "Formant 3 (F3)": [1800, 4000]
     }
   
-    const range = ranges[label] || [0, 5000]
+    const range = overrideRange || defaultRanges[label] || [0, 5000]
   
     // Normalize X values
     const minX = analysis?._minX || 0
@@ -375,7 +385,9 @@ function App() {
   
         {analysis && (
           <div style={{ marginTop: '2rem' }}>
-          {analysis?.pitch && renderLineChart('Pitch (Hz)', analysis.pitch, '#2ecc71', currentTime, duration)}
+          {analysis?.pitch && renderLineChart(
+            'Pitch', analysis.pitch, '#2ecc71', currentTime, duration, [60, 450]
+          )}
           {analysis?.f1 && renderLineChart('Formant 1 (F1)', analysis.f1, '#f39c12', currentTime, duration)}
           {analysis?.f2 && renderLineChart('Formant 2 (F2)', analysis.f2, '#e74c3c', currentTime, duration)}
           {analysis?.f3 && renderLineChart('Formant 3 (F3)', analysis.f3, '#8e44ad', currentTime, duration)}
