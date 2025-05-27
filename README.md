@@ -2,6 +2,12 @@
 
 **SpeakEasy** is a privacy-focused web app for real-time vocal analysis. It allows users to record their voice and visualize features like pitch, formant frequencies, and clarity. This project was developed during HackDavis 2025 to support applications such as gender-affirming voice training and self-guided vocal exploration.
 
+## Example Use
+
+You can see an example of SpeakEasy in action here:  
+Video demo: https://youtu.be/lapztrYUthY  
+Devpost submission: https://devpost.com/software/speakeasy-zqhm6t
+
 ## Features
 
 - In-browser audio recording and playback
